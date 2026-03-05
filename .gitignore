@@ -26,11 +26,6 @@ Thumbs.db
 # Media
 app/web/media/profile_pics/
 
-# Static files
-app/web/static/css/
-
-# Templates
-app/web/templates/*.html
 
 # Others
 *.sqlite3

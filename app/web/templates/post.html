@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+{% block content %}
+    {% set author_name = post.author.username if post.author.username is defined else post.author %}
+    {% set post_date = post.date if post.date is defined else post.date_posted.strftime("%Y-%m-%d") %}
+
+    <div class="post">
+        <h1 class="post-title">{{ post.title }}</h1>
+        <div class="post-meta">Por {{ author_name }} | {{ post_date }}</div>
+        <p class="post-content">{{ post.content }}</p>
+    </div>
+    <a href="/" class="navbar-link">Volver al inicio</a>
+{% endblock content %}

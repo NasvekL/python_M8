@@ -1,0 +1,57 @@
+/* custom.css: estilos básicos para el blog */
+body {
+    background-color: #f3f4f6;
+    font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+.navbar {
+    background-color: #2563eb;
+    color: #fff;
+    padding: 1rem;
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navbar-title {
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+.navbar-link {
+    color: #fff;
+    text-decoration: underline;
+    font-size: 1rem;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+.post {
+    background: #fff;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.post-title {
+    color: #2563eb;
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.post-content {
+    color: #374151;
+    margin-bottom: 0.5rem;
+}
+
+.post-meta {
+    color: #6b7280;
+    font-size: 0.875rem;
+}
