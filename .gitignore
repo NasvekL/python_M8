@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+
+# Virtual environments
+env/
+venv/
+.venv/
+
+# VS Code
+.vscode/
+
+# Alembic
+alembic/versions/__pycache__/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Media
+app/web/media/profile_pics/
+
+# Static files
+app/web/static/css/
+
+# Templates
+app/web/templates/*.html
+
+# Others
+*.sqlite3
+*.db
+
+# Ignore environment files
+.env
+.env.*
