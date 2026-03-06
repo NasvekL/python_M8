@@ -1,13 +1,13 @@
 {% extends "layout.html" %}
 {% block content %}
-    <h1 class="post-title">Bienvenido a FastAPI</h1>
-    <p class="post-content">Esta es la página de inicio.</p>
-    {% for post in posts %}
-        <div class="post">
-            <h2 class="post-title"><a href="{{ url_for('read_post', post_id=post.id) }}">{{ post.title }}</a></h2>
-            <p class="post-content">{{ post.content }}</p>
-            <div class="post-meta">Por {{ post.author }} | {{ post.date }}</div>
-        </div>
-    {% endfor %}
-    <a href="/" class="navbar-link">Volver al inicio</a>
+<h1 class="post-title">Bienvenido a FastAPI</h1>
+<p class="post-content">Esta es la página de inicio.</p>
+{% for post in posts %}
+<div class="post">
+    <h2 class="post-title"><a href="{{ url_for('read_post', post_id=post.id) }}">{{ post.title }}</a></h2>
+    <p class="post-content">{{ post.content }}</p>
+    <div class="post-meta">Por {{ post.author }} | {{ post.date }}</div>
+</div>
+{% endfor %}
+<a href="/" class="navbar-link">Volver al inicio</a>
 {% endblock content %}
