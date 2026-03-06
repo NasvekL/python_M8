@@ -46,7 +46,7 @@ async def delete(db: AsyncSession, user: User) -> None:
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from models.user import User
+from app.models.user import User
 
 
 async def get_all(db: AsyncSession) -> list[User]:

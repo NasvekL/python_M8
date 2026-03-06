@@ -1,8 +1,8 @@
-from core.exceptions_handler import NotFoundError
-from repositories import post_repo, user_repo
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from schemas.post import PostCreate, PostPatch, PostPut
+from app.core.exceptions_handler import NotFoundError
+from app.repositories import post_repo, user_repo
+from app.schemas.post import PostCreate, PostPatch, PostPut
 
 
 async def get_posts(db: AsyncSession):

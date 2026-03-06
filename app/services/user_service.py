@@ -1,8 +1,8 @@
-from core.exceptions_handler import AlreadyExistsError, NotFoundError
-from repositories import user_repo
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from schemas.user import UserCreate, UserPatch
+from app.core.exceptions_handler import AlreadyExistsError, NotFoundError
+from app.repositories import user_repo
+from app.schemas.user import UserCreate, UserPatch
 
 
 async def get_users(db: AsyncSession):

@@ -1,11 +1,12 @@
 import logging
 
-from core.config import BASE_DIR
 from fastapi import FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from fastapi.templating import Jinja2Templates
 from starlette.exceptions import HTTPException as StarletteHTTPException
+
+from app.core.config import BASE_DIR
 
 logger = logging.getLogger(__name__)
 templates = Jinja2Templates(directory=BASE_DIR / "web/templates")

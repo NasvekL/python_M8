@@ -7,14 +7,10 @@ from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
-# Añadir app/ al sys.path para que los imports internos funcionen
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "app"))
-
-from core.config import DATABASE_URL
-
-import models  # noqa: E402  # importa los modelos para registrar el metadata
+import app.models  # noqa: E402  # importa los modelos para registrar el metadata
 from alembic import context
-from db.base import Base
+from app.core.config import DATABASE_URL
+from app.db.base import Base
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -99,5 +95,4 @@ def run_migrations_online() -> None:
 if context.is_offline_mode():
     run_migrations_offline()
 else:
-    run_migrations_online()
     run_migrations_online()

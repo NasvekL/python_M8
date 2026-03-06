@@ -1,11 +1,12 @@
 from typing import Annotated
 
-from api.deps import get_db
-from core.config import BASE_DIR
 from fastapi import APIRouter, Depends, Request
 from fastapi.templating import Jinja2Templates
-from services import post_service
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.api.deps import get_db
+from app.core.config import BASE_DIR
+from app.services import post_service
 
 router = APIRouter(include_in_schema=False)
 

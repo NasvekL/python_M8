@@ -1,11 +1,12 @@
 from contextlib import asynccontextmanager
 
-from api.v1.router import api_router
-from core.config import BASE_DIR
-from core.exceptions_handler import register_exception_handlers
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
-from web.views import router as web_router
+
+from app.api.v1.router import api_router
+from app.core.config import BASE_DIR
+from app.core.exceptions_handler import register_exception_handlers
+from app.web.views import router as web_router
 
 
 @asynccontextmanager
