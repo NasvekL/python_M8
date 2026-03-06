@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        {% if title %}
+        FastAPI Blog - {{title}}
+        {% else %}
+        FastAPI Blog
+        {% endif %}
+    </title>
+
+
+    <link rel="stylesheet" href="{{ url_for('static', path='css/custom.css') }}">
+</head>
+
+<body>
+    <nav class="navbar">
+        <span class="navbar-title">FastAPI Blog</span>
+        <a href="/posts" class="navbar-link">Posts</a>
+        <button class="navbar-link" onclick="document.getElementById('createPostModal').style.display='block'">Crear
+            Post</button>
+
+    </nav>
+    <div class="container">
+        {% block content %}
+        {% endblock content %}
+    </div>
+</body>
+
+<footer>
+    <div class="footer-inner">
+        <div>
+            <div class="footer-brand">FastAPI Blog</div>
+            <div class="footer-tagline">Un blog construido con Python y FastAPI</div>
+        </div>
+        <ul class="footer-links">
+            <li><a href="/">Inicio</a></li>
+            <li><a href="/posts">Posts</a></li>
+            <li><a href="/docs">API Docs</a></li>
+        </ul>
+    </div>
+    <div class="footer-bottom">
+        &copy; 2025 FastAPI Blog &mdash; Todos los derechos reservados
+    </div>
+</footer>
+
+<div id="createPostModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="document.getElementById('createPostModal').style.display='none'">&times;</span>
+        <h2>Crear Nuevo Post</h2>
+        <form id="createPostForm">
+            <label for="title">Título:</label>
+            <input type="text" id="title" name="title" required>
+
+            <label for="content">Contenido:</label>
+            <textarea id="content" name="content" rows="4" required></textarea>
+
+            <button type="submit">Publicar</button>
+        </form>
+    </div>
+</div>
+
+<!-- sucess modal -->
+<div id="successModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="document.getElementById('successModal').style.display='none'">&times;</span>
+        <h2 id="successMessage">Post creado exitosamente</h2>
+    </div>
+</div>
+
+<!-- error modal -->
+<div id="errorModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="document.getElementById('errorModal').style.display='none'">&times;</span>
+        <h2 id="errorMessage">Error al crear el post</h2>
+    </div>
+</div>
+
+<script type="module">
+    import { openModal, closeModal, getErrorMessage } from '{{ url_for("static", path="js/utils.js") }}';
+
+    const createPostForm = document.getElementById('createPostForm');
+    const successModal = document.getElementById('successModal');
+    const errorModal = document.getElementById('errorModal');
+    const errorMessage = document.getElementById('errorMessage');
+    const successMessage = document.getElementById('successMessage');
+
+    createPostForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData(createPostForm);
+        const postData = {
+            title: formData.get('title'),
+            content: formData.get('content'),
+        };
+        //temporary hardcoded
+        postData.user_id = 1;
+
+        const response = await fetch('/api/v1/posts', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(postData),
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            closeModal('createPostModal');
+            successMessage.textContent = `Post creado exitosamente con el id ${data.id}`;
+            openModal('successModal');
+            createPostForm.reset();
+
+            //reload page after modal success hidden
+            document.getElementById('successModal').addEventListener('close', () => {
+                location.reload();
+            }, { once: true });
+        } else {
+            closeModal('createPostModal');
+            errorMessage.textContent = getErrorMessage(response);
+            openModal('errorModal');
+        }
+    });
+</script>
+
+{% block scripts %}
+{% endblock scripts %}
+
+</html>

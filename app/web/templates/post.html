@@ -1,0 +1,102 @@
+{% extends "layout.html" %}
+{% block content %}
+{% set author_name = post.author.username if post.author.username is defined else post.author %}
+{% set post_date = post.date if post.date is defined else post.date_posted.strftime("%Y-%m-%d") %}
+
+<div class="post">
+    <h1 class="post-title">{{ post.title }}</h1>
+    <div class="post-meta">Por {{ author_name }} | {{ post_date }}</div>
+    <p class="post-content">{{ post.content }}</p>
+
+    <div class="post-actions">
+        <button class="btn btn-edit" id="btnEdit">✏️ Editar</button>
+        <button class="btn btn-delete" id="btnDelete">🗑️ Eliminar</button>
+    </div>
+</div>
+<a href="/" class="btn btn-back">← Volver al inicio</a>
+
+<!-- Edit modal -->
+<div id="editPostModal" class="modal">
+    <div class="modal-content">
+        <span class="close" id="closeEditModal">&times;</span>
+        <h2>Editar Post</h2>
+        <form id="editPostForm">
+            <label for="editTitle">Título:</label>
+            <input type="text" id="editTitle" name="title" value="{{ post.title }}" required>
+
+            <label for="editContent">Contenido:</label>
+            <textarea id="editContent" name="content" rows="4" required>{{ post.content }}</textarea>
+
+            <button type="submit" class="btn-publish">Guardar cambios</button>
+        </form>
+    </div>
+</div>
+
+<!-- Delete confirmation modal -->
+<div id="deletePostModal" class="modal">
+    <div class="modal-content">
+        <span class="close" id="closeDeleteModal">&times;</span>
+        <h2>¿Eliminar este post?</h2>
+        <p>Esta acción no se puede deshacer.</p>
+        <div class="confirm-actions">
+            <button class="btn btn-cancel" id="btnCancelDelete">Cancelar</button>
+            <button class="btn btn-confirm-delete" id="btnConfirmDelete">Eliminar</button>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
+
+{% block scripts %}
+<script type="module">
+    import { openModal, closeModal } from '{{ url_for("static", path="js/utils.js") }}';
+
+    const postId = {{ post.id }};
+    const userId = {{ post.user_id }};
+
+    // Open modals
+    document.getElementById('btnEdit').addEventListener('click', () => openModal('editPostModal'));
+    document.getElementById('btnDelete').addEventListener('click', () => openModal('deletePostModal'));
+
+    // Close modals
+    document.getElementById('closeEditModal').addEventListener('click', () => closeModal('editPostModal'));
+    document.getElementById('closeDeleteModal').addEventListener('click', () => closeModal('deletePostModal'));
+    document.getElementById('btnCancelDelete').addEventListener('click', () => closeModal('deletePostModal'));
+
+    // Edit post
+    document.getElementById('editPostForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const form = e.target;
+        const body = {
+            title: form.title.value,
+            content: form.content.value,
+            user_id: userId,
+        };
+
+        const response = await fetch(`/api/v1/posts/${postId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+        });
+
+        if (response.ok) {
+            location.reload();
+        } else {
+            alert('Error al editar el post');
+        }
+    });
+
+    // Delete post
+    document.getElementById('btnConfirmDelete').addEventListener('click', async () => {
+        const response = await fetch(`/api/v1/posts/${postId}`, {
+            method: 'DELETE',
+        });
+
+        if (response.ok || response.status === 204) {
+            window.location.href = '/';
+        } else {
+            alert('Error al eliminar el post');
+        }
+    });
+</script>
+{% endblock scripts %}

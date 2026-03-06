@@ -1,0 +1,9 @@
+[tool.isort]
+profile = "black"
+known_first_party = ["models", "db", "app", "schemas", "app.db.base"]
+[project]
+name = "python_M8"
+version = "0.1.0"
+dependencies = [
+	"fastapi", "uv", "fastapi[standard]", "alembic", "aiosqlite"
+]
