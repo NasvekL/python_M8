@@ -1,4 +1,4 @@
 from .post import Post
 from .user import User
 
-all = ["User", "Post"]
+__all__ = ["User", "Post"]

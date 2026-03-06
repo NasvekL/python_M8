@@ -1,11 +1,11 @@
 from typing import Annotated
 
-from api.deps import get_db
 from fastapi import APIRouter, Depends, status
-from services import post_service
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from schemas.post import PostCreate, PostPatch, PostPut, PostResponse
+from app.api.deps import get_db
+from app.schemas.post import PostCreate, PostPatch, PostPut, PostResponse
+from app.services import post_service
 
 router = APIRouter(prefix="/posts", tags=["Posts"])
 

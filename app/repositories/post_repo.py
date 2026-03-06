@@ -2,7 +2,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from models.post import Post
+from app.models.post import Post
 
 
 async def get_all(db: AsyncSession) -> list[Post]:
@@ -30,12 +30,16 @@ async def create(
     post = Post(title=title, content=content, user_id=user_id)
     db.add(post)
     await db.commit()
-    return await get_by_id(db, post.id)
+    await db.refresh(post)
+
+    return post
 
 
 async def update(db: AsyncSession, post: Post) -> Post:
     await db.commit()
-    return await get_by_id(db, post.id)
+    await db.refresh(post)
+
+    return post
 
 
 async def delete(db: AsyncSession, post: Post) -> None:
