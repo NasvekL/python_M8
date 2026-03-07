@@ -6,10 +6,10 @@ from fastapi.responses import JSONResponse
 from fastapi.templating import Jinja2Templates
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from app.core.config import BASE_DIR
+from app.core.config import APP_DIR
 
 logger = logging.getLogger(__name__)
-templates = Jinja2Templates(directory=BASE_DIR / "web/templates")
+templates = Jinja2Templates(directory=APP_DIR / "web/templates")
 
 
 def _is_api(request: Request) -> bool:
@@ -88,8 +88,8 @@ async def generic_exception_handler(request: Request, exc: Exception):
 
 
 def register_exception_handlers(app: FastAPI) -> None:
-    app.add_exception_handler(NotFoundError, not_found_handler)
-    app.add_exception_handler(AlreadyExistsError, already_exists_handler)
-    app.add_exception_handler(StarletteHTTPException, http_exception_handler)
-    app.add_exception_handler(RequestValidationError, validation_exception_handler)
+    app.add_exception_handler(NotFoundError, not_found_handler)  # type: ignore
+    app.add_exception_handler(AlreadyExistsError, already_exists_handler)  # type: ignore
+    app.add_exception_handler(StarletteHTTPException, http_exception_handler)  # type: ignore
+    app.add_exception_handler(RequestValidationError, validation_exception_handler)  # type: ignore
     app.add_exception_handler(Exception, generic_exception_handler)

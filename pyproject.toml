@@ -5,5 +5,12 @@ known_first_party = ["models", "db", "app", "schemas", "app.db.base"]
 name = "python_M8"
 version = "0.1.0"
 dependencies = [
-	"fastapi", "uv", "fastapi[standard]", "alembic", "aiosqlite"
+	"fastapi",
+	"uv",
+	"fastapi[standard]",
+	"alembic",
+	"aiosqlite",
+	"pwdlib[argon2]>=0.3.0",
+	"pyjwt>=2.11.0",
+	"pydantic-settings>=2.13.1",
 ]

@@ -1,4 +1,4 @@
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.user import User
@@ -15,17 +15,23 @@ async def get_by_id(db: AsyncSession, user_id: int) -> User | None:
 
 
 async def get_by_username(db: AsyncSession, username: str) -> User | None:
-    result = await db.execute(select(User).where(User.username == username))
+    result = await db.execute(
+        select(User).where(func.lower(User.username) == username.lower())
+    )
     return result.scalar_one_or_none()
 
 
 async def get_by_email(db: AsyncSession, email: str) -> User | None:
-    result = await db.execute(select(User).where(User.email == email))
+    result = await db.execute(
+        select(User).where(func.lower(User.email) == email.lower())
+    )
     return result.scalar_one_or_none()
 
 
-async def create(db: AsyncSession, username: str, email: str) -> User:
-    user = User(username=username, email=email)
+async def create(
+    db: AsyncSession, username: str, email: str, password_hash: str
+) -> User:
+    user = User(username=username, email=email.lower(), password_hash=password_hash)
     db.add(user)
     await db.commit()
     await db.refresh(user)

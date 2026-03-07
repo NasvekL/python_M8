@@ -19,10 +19,13 @@
 <body>
     <nav class="navbar">
         <span class="navbar-title">FastAPI Blog</span>
-        <a href="/posts" class="navbar-link">Posts</a>
-        <button class="navbar-link" onclick="document.getElementById('createPostModal').style.display='block'">Crear
-            Post</button>
-
+        <div class="navbar-links">
+            <a href="/posts" class="navbar-link">Posts</a>
+            <button class="navbar-link" id="btnAbrirCrearPost">Crear Post</button>
+        </div>
+        <div class="navbar-auth" id="navbarAuth">
+            <!-- Populated by JS based on auth state -->
+        </div>
     </nav>
     <div class="container">
         {% block content %}
@@ -63,7 +66,48 @@
     </div>
 </div>
 
-<!-- sucess modal -->
+<!-- Login Modal -->
+<div id="loginModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="document.getElementById('loginModal').style.display='none'">&times;</span>
+        <h2>Iniciar Sesión</h2>
+        <form id="loginForm">
+            <label for="loginEmail">Correo electrónico:</label>
+            <input type="email" id="loginEmail" name="email" placeholder="tu@email.com" required>
+
+            <label for="loginPassword">Contraseña:</label>
+            <input type="password" id="loginPassword" name="password" placeholder="••••••••" required>
+
+            <button type="submit">Iniciar Sesión</button>
+        </form>
+        <p class="auth-switch">¿No tienes cuenta? <a href="#" id="switchToRegister">Regístrate aquí</a></p>
+        <p id="loginError" class="auth-error" style="display:none;"></p>
+    </div>
+</div>
+
+<!-- Register Modal -->
+<div id="registerModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="document.getElementById('registerModal').style.display='none'">&times;</span>
+        <h2>Crear Cuenta</h2>
+        <form id="registerForm">
+            <label for="registerUsername">Nombre de usuario:</label>
+            <input type="text" id="registerUsername" name="username" placeholder="usuario123" required>
+
+            <label for="registerEmail">Correo electrónico:</label>
+            <input type="email" id="registerEmail" name="email" placeholder="tu@email.com" required>
+
+            <label for="registerPassword">Contraseña:</label>
+            <input type="password" id="registerPassword" name="password" placeholder="••••••••" required>
+
+            <button type="submit">Registrarse</button>
+        </form>
+        <p class="auth-switch">¿Ya tienes cuenta? <a href="#" id="switchToLogin">Inicia sesión aquí</a></p>
+        <p id="registerError" class="auth-error" style="display:none;"></p>
+    </div>
+</div>
+
+
 <div id="successModal" class="modal">
     <div class="modal-content">
         <span class="close" onclick="document.getElementById('successModal').style.display='none'">&times;</span>
@@ -81,7 +125,113 @@
 
 <script type="module">
     import { openModal, closeModal, getErrorMessage } from '{{ url_for("static", path="js/utils.js") }}';
+    import { getToken, setToken, getCurrentUser, logout, clearUserCache } from '{{ url_for("static", path="js/auth.js") }}';
 
+    // ── Auth: render navbar ────────────────────────────────────────────
+    function renderNavbarAuth() {
+        const authDiv = document.getElementById('navbarAuth');
+        const token = getToken();
+        if (token) {
+            const username = localStorage.getItem('username') || '';
+            authDiv.innerHTML = `
+                <span class="navbar-username">&#128100; ${username}</span>
+                <button class="navbar-btn-logout" id="btnLogout">Cerrar Sesión</button>
+            `;
+            document.getElementById('btnLogout').addEventListener('click', () => logout());
+        } else {
+            authDiv.innerHTML = `
+                <button class="navbar-btn-login" id="btnOpenLogin">Iniciar Sesión</button>
+                <button class="navbar-btn-register" id="btnOpenRegister">Registrarse</button>
+            `;
+            document.getElementById('btnOpenLogin').addEventListener('click', () => openModal('loginModal'));
+            document.getElementById('btnOpenRegister').addEventListener('click', () => openModal('registerModal'));
+        }
+    }
+
+    renderNavbarAuth();
+
+    // Switch between modals
+    document.getElementById('switchToRegister').addEventListener('click', (e) => {
+        e.preventDefault();
+        closeModal('loginModal');
+        openModal('registerModal');
+    });
+    document.getElementById('switchToLogin').addEventListener('click', (e) => {
+        e.preventDefault();
+        closeModal('registerModal');
+        openModal('loginModal');
+    });
+
+    // ── Login form ────────────────────────────────────────────────────
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const loginError = document.getElementById('loginError');
+        loginError.style.display = 'none';
+
+        const formData = new FormData();
+        formData.append('username', document.getElementById('loginEmail').value);
+        formData.append('password', document.getElementById('loginPassword').value);
+
+        const response = await fetch('/api/v1/users/token', {
+            method: 'POST',
+            body: formData,
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            setToken(data.access_token);
+            clearUserCache();
+            const me = await getCurrentUser();
+            if (me) localStorage.setItem('username', me.username);
+            closeModal('loginModal');
+            document.getElementById('loginForm').reset();
+            renderNavbarAuth();
+        } else {
+            const err = await response.json();
+            loginError.textContent = err.detail || 'Error al iniciar sesión';
+            loginError.style.display = 'block';
+        }
+    });
+
+    // ── Register form ─────────────────────────────────────────────────
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const registerError = document.getElementById('registerError');
+        registerError.style.display = 'none';
+
+        const userData = {
+            username: document.getElementById('registerUsername').value,
+            email: document.getElementById('registerEmail').value,
+            password: document.getElementById('registerPassword').value,
+        };
+
+        const response = await fetch('/api/v1/users/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(userData),
+        });
+
+        if (response.ok) {
+            closeModal('registerModal');
+            document.getElementById('registerForm').reset();
+            openModal('loginModal');
+            document.getElementById('loginEmail').value = userData.email;
+        } else {
+            const err = await response.json();
+            const msg = Array.isArray(err.detail)
+                ? err.detail.map(d => d.msg).join(', ')
+                : (err.detail || 'Error al registrarse');
+            registerError.textContent = msg;
+            registerError.style.display = 'block';
+        }
+    });
+
+    // ── Crear Post button ──────────────────────────────────────────────
+    document.getElementById('btnAbrirCrearPost').addEventListener('click', () => {
+        openModal('createPostModal');
+    });
+
+    // ── Crear Post form ────────────────────────────────────────────────
     const createPostForm = document.getElementById('createPostForm');
     const successModal = document.getElementById('successModal');
     const errorModal = document.getElementById('errorModal');
@@ -119,8 +269,9 @@
                 location.reload();
             }, { once: true });
         } else {
+            const err = await response.json();
             closeModal('createPostModal');
-            errorMessage.textContent = getErrorMessage(response);
+            errorMessage.textContent = getErrorMessage(err);
             openModal('errorModal');
         }
     });

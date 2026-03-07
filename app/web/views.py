@@ -5,12 +5,12 @@ from fastapi.templating import Jinja2Templates
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_db
-from app.core.config import BASE_DIR
+from app.core.config import APP_DIR
 from app.services import post_service
 
 router = APIRouter(include_in_schema=False)
 
-templates = Jinja2Templates(directory=BASE_DIR / "web/templates")
+templates = Jinja2Templates(directory=APP_DIR / "web/templates")
 
 
 @router.get("/")
