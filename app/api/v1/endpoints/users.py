@@ -33,8 +33,16 @@ async def get_current_user(
     db: Annotated[AsyncSession, Depends(get_db)],
 ):
     """Get the currently authenticated user based on the provided access token."""
-    user_id = verify_access_token(token)
-    if user_id is None or not isinstance(user_id, int):
+    payload = verify_access_token(token)
+    if payload is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid authentication credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    try:
+        user_id = int(payload["sub"])
+    except (KeyError, ValueError, TypeError):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid authentication credentials",

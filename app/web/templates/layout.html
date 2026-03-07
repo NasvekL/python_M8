@@ -168,13 +168,14 @@
         const loginError = document.getElementById('loginError');
         loginError.style.display = 'none';
 
-        const formData = new FormData();
-        formData.append('username', document.getElementById('loginEmail').value);
-        formData.append('password', document.getElementById('loginPassword').value);
+        const params = new URLSearchParams();
+        params.append('username', document.getElementById('loginEmail').value);
+        params.append('password', document.getElementById('loginPassword').value);
 
         const response = await fetch('/api/v1/users/token', {
             method: 'POST',
-            body: formData,
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: params,
         });
 
         if (response.ok) {
@@ -241,15 +242,21 @@
     createPostForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
+        const me = await getCurrentUser();
+        if (!me) {
+            closeModal('createPostModal');
+            openModal('loginModal');
+            return;
+        }
+
         const formData = new FormData(createPostForm);
         const postData = {
             title: formData.get('title'),
             content: formData.get('content'),
+            user_id: me.id,
         };
-        //temporary hardcoded
-        postData.user_id = 1;
 
-        const response = await fetch('/api/v1/posts', {
+        const response = await fetch('/api/v1/posts/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

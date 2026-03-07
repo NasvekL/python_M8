@@ -32,14 +32,13 @@ async def create(
     await db.commit()
     await db.refresh(post)
 
-    return post
+    return await get_by_id(db, post.id)
 
 
 async def update(db: AsyncSession, post: Post) -> Post:
     await db.commit()
-    await db.refresh(post)
 
-    return post
+    return await get_by_id(db, post.id)
 
 
 async def delete(db: AsyncSession, post: Post) -> None:
